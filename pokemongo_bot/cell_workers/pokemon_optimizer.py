@@ -212,7 +212,14 @@ class PokemonOptimizer(Datastore, BaseTask):
         return sorted(family, key=lambda p: self.get_rank(p, criteria), reverse=True)
 
     def get_rank(self, pokemon, criteria):
-        return tuple(getattr(pokemon, a, None) for a in criteria.get("sort"))
+        if criteria.endswith("-miniv"):
+            rank = self.get_rank(pokemon, criteria[:-6])
+            if pokemon.iv >= self.config_minimum_evolve_iv:
+                rank += 10000
+        else:
+            rank = tuple(getattr(pokemon, a, None) for a in criteria.get("sort"))
+
+        return rank
 
     def get_pokemon_max_cp(self, pokemon_name):
         return int(self.pokemon_max_cp.get(pokemon_name, 0))
