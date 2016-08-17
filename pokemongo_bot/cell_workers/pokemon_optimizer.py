@@ -36,6 +36,8 @@ class PokemonOptimizer(Datastore, BaseTask):
         self.config_evolve_only_with_lucky_egg = self.config.get("evolve_only_with_lucky_egg", False)
         self.config_evolve_count_for_lucky_egg = self.config.get("evolve_count_for_lucky_egg", 92)
         self.config_may_use_lucky_egg = self.config.get("may_use_lucky_egg", False)
+        self.config_pokemon_for_xp = self.config.get("pokemon_for_xp", ["Rattata", "Pidgey", "Weedle", "Zubat", "Caterpie"])
+        self.config_minimum_evolve_iv = self.config.get("minimum_evolve_iv", 0.9)
         self.config_keep = self.config.get("keep", [{"top": 1, "evolve": True, "sort": ["iv"]},
                                                     {"top": 1, "evolve": True, "sort": ["ncp"]},
                                                     {"top": 1, "evolve": False, "sort": ["cp"]}])
@@ -239,6 +241,9 @@ class PokemonOptimizer(Datastore, BaseTask):
             if not pokemon.has_next_evolution():
                 continue
 
+            if pokemon.iv < self.config_minimum_evolve_iv:
+                continue
+
             candies -= pokemon.evolution_cost
 
             if candies < 0:
@@ -255,7 +260,7 @@ class PokemonOptimizer(Datastore, BaseTask):
             next_evo.name = inventory.pokemons().name_for(next_pid)
             evolve_best.append(next_evo)
 
-        if self.config_evolve_for_xp:
+        if self.config_evolve_for_xp and self.use_pokemon_for_xp(family_id):
             # Compute how many crap we should keep if we want to batch evolve them for xp
             junior_evolution_cost = inventory.pokemons().evolution_cost_for(family_id)
 
@@ -437,3 +442,6 @@ class PokemonOptimizer(Datastore, BaseTask):
             sleep(self.config_evolve_time)
 
         return True
+
+    def use_pokemon_for_xp(self, family_id):
+        return inventory.pokemons().name_for(family_id) in self.config_pokemon_for_xp
