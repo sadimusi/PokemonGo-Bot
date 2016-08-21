@@ -167,7 +167,7 @@ class PokemonOptimizer(Datastore, BaseTask):
             transfer, evo_best, evo_crap, upgrade = self.get_family_optimized(family_id, other_family)
         elif len(senior_pids) < nb_branch:
             # We did not get every combination yet = All other Pokemon are potentially good to keep
-            transfer, evo_best, evo_crap, upgrade = self.get_evolution_plan(family_id, [], other_family, [])
+            transfer, evo_best, evo_crap, upgrade = self.get_evolution_plan(family_id, [], other_family, [], [])
             evo_best.sort(key=lambda p: p.iv * p.ncp, reverse=True)
         else:
             evolve_best = []
