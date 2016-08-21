@@ -62,7 +62,7 @@ class PokemonOptimizer(Datastore, BaseTask):
         return inventory.Pokemons.get_space_left()
 
     def work(self):
-        if (not self.enabled) or (self.get_pokemon_slot_left() > 200):
+        if (not self.enabled) or (self.get_pokemon_slot_left() > 5):
             return WorkerResult.SUCCESS
 
         self.open_inventory()
