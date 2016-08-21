@@ -339,6 +339,26 @@ class Pokemons(_BaseInventoryComponent):
         self._data.pop(pokemon_unique_id)
 
 
+class PlayerStats(object):
+    TYPE = "player_stats"
+
+    def __init__(self):
+        self._data = {}
+
+    def refresh(self, inventory):
+        for item in inventory:
+            data = item['inventory_item_data']
+            if self.TYPE in data:
+                self._data = data[self.TYPE]
+
+    def __getattr__(self, name):
+        if name not in self._data:
+            raise AttributeError
+        return self._data[name]
+
+    def get(self, name, default=None):
+        return self._data.get(name, default)
+
 #
 # Static Components
 
@@ -1083,6 +1103,7 @@ class Inventory(object):
         self.candy = Candies()
         self.items = Items()
         self.pokemons = Pokemons()
+        self.player_stats = PlayerStats()
         self.refresh()
         self.item_inventory_size = None
         self.pokemon_inventory_size = None
@@ -1090,7 +1111,7 @@ class Inventory(object):
     def refresh(self):
         inventory = self.bot.api.get_inventory()
         inventory = inventory['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']
-        for i in (self.pokedex, self.candy, self.items, self.pokemons):
+        for i in (self.pokedex, self.candy, self.items, self.pokemons, self.player_stats):
             i.refresh(inventory)
 
         user_web_inventory = os.path.join(_base_dir, 'web', 'inventory-%s.json' % (self.bot.config.username))
@@ -1242,6 +1263,15 @@ def pokemons():
     :rtype: Pokemons
     """
     return _inventory.pokemons
+
+
+def player_stats():
+    """
+
+    :return:
+    :rtype: PlayerStats
+    """
+    return _inventory.player_stats
 
 
 def items():

@@ -42,6 +42,7 @@ class ColoredLoggingHandler(EventHandler):
         'pokemon_capture_failed':            'red',
         'pokemon_caught':                    'blue',
         'pokemon_evolved':                   'green',
+        'pokemon_upgraded':                   'green',
         'pokemon_fled':                      'red',
         'pokemon_inventory_full':            'red',
         'pokemon_nickname_invalid':          'red',

@@ -365,6 +365,10 @@ class PokemonGoBot(Datastore):
             'pokemon_evolved',
             parameters=('pokemon', 'iv', 'cp', 'xp', 'candy')
         )
+        self.event_manager.register_event(
+            'pokemon_upgraded',
+            parameters=('pokemon', 'iv', 'from_cp', 'to_cp', 'from_level', 'to_level', 'candy', 'stardust')
+        )
         self.event_manager.register_event('skip_evolve')
         self.event_manager.register_event('threw_berry_failed', parameters=('status_code',))
         self.event_manager.register_event('vip_pokemon')
@@ -934,7 +938,7 @@ class PokemonGoBot(Datastore):
             if show_candies:
                 line_p += '[{} candies]'.format(pokes[0].candy_quantity)
             line_p += ': '
-            
+
             poke_info = ['({})'.format(', '.join([get_poke_info(x, p) for x in poke_info_displayed])) for p in pokes]
             self.logger.info(line_p + ' | '.join(poke_info))
 
@@ -1085,7 +1089,8 @@ class PokemonGoBot(Datastore):
             request = self.api.create_request()
             request.get_player()
             request.check_awarded_badges()
-            request.call()
+            response_dict = request.call()
+            self._player = response_dict['responses']['GET_PLAYER']['player_data']
         try:
             self.web_update_queue.put_nowait(True)  # do this outside of thread every tick
         except Queue.Full:

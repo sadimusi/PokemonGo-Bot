@@ -273,7 +273,7 @@ class MoveToMapPokemon(BaseTask):
 
         if snipe_pokemon and self.config['snipe']:
             pokemon = snipe_pokemon[0]
-            if pokeballs + superballs > self.min_ball or pokemon['is_vip']:
+            if pokeballs_quantity + superballs_quantity > self.min_ball or pokemon['is_vip']:
                 if self.config['snipe_high_prio_only']:
                     if self.config['snipe_high_prio_threshold'] <= pokemon['priority'] or pokemon['is_vip']:
                         self.snipe(pokemon)
@@ -288,9 +288,12 @@ class MoveToMapPokemon(BaseTask):
                         p['dist'] <= self.config['max_distance']]
 
         if not walk_pokemon:
-            walk_pokemon = sorted(pokemon_list, key='dist')
+            walk_pokemon = sorted(pokemon_list, key=lambda p: p['dist'])
 
         pokemon = walk_pokemon[0]
+
+        if pokemon['dist'] > self.config['skip_distance']:
+            return WorkerResult.SUCCESS
 
         nearest_fort = self.get_nearest_fort_on_the_way(pokemon)
 
