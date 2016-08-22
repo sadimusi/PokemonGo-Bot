@@ -186,7 +186,11 @@ class PokemonOptimizer(Datastore, BaseTask):
                 for f in senior_grouped_family.values():
                     top += self.get_top_rank(f, criteria)
 
-                worst = self.get_sorted_family(top, criteria)[-1]
+                sorted_family = self.get_sorted_family(top, criteria)
+                if not sorted_family:
+                    continue
+
+                worst = sorted_family[-1]
                 best = self.get_better_rank(family, criteria, worst)
 
                 keep_best += best
